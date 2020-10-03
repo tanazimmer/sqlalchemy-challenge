@@ -104,6 +104,20 @@ def only_start(start):
     date_data = list(np.ravel(data))
     return jsonify(date_data)
 
+#start and end route
+@app.route('/api/v1.0/<start>/<end>')
+def start_end(start, end):
+    #define start and end date
+    start_date = start.replace(" ", "")
+    end_date = end.replace(" ", "")
+    #query data, filter by dates
+    data = session.query(func.min(Measurement.tobs),func.avg(Measurement.tobs),func.max(Measurement.tobs)).\
+    filter(Measurement.date >= start_date).\
+    filter(Measurement.date <= end_date).all()
+    #list and jsonify
+    date_range_data = list(np.ravel(data))
+    return jsonify(date_range_data)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
