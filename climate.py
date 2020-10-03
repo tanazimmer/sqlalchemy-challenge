@@ -68,9 +68,22 @@ def stations():
     station_names = list(np.ravel(stations))
     return jsonify(station_names)
 
+@app.route('/api/v1.0/tobs')
+def tobs():
+    
+    last_date = session.query(Measurement.date).order_by(Measurement.date.desc()).first()
+    one_year_ago = dt.date(2017, 8, 23) - dt.timedelta(days=365)
 
+    active_stations = session.query(Measurement.station, func.count(Measurement.station)).\
+    group_by(Measurement.station).order_by(func.count(Measurement.station).desc()).all()
 
+    most_active_station=active_stations[0][0]
 
+    tobs = session.query(Measurement.date, Measurement.tobs).\
+    filter(Measurement.station == most_active_station).filter(Measurement.date >= one_year_ago).all()
+
+    tobs_dict = dict(tobs)
+    return jsonify(tobs_dict)
 
 if __name__ == '__main__':
     app.run(debug=True)
