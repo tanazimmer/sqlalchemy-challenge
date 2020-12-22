@@ -51,24 +51,51 @@ plt.show()
 ### Station Analysis - climate.py
 
 * Design a query to calculate the total number of stations.
+```
+locations = session.query(Station)
+```
 
 * Design a query to find the most active stations.
 
   * List the stations and observation counts in descending order.
+```
+active_stations = session.query(Measurement.station, func.count(Measurement.station)).\
+        group_by(Measurement.station).order_by(func.count(Measurement.station).desc()).all()
+active_stations_df = pd.DataFrame(active_stations, columns=['Station Name', 'Counts'])
+```
+
+
 
   * Which station has the highest number of observations?
-
-  * Hint: You will need to use a function such as `func.min`, `func.max`, `func.avg`, and `func.count` in your queries.
+```
+most_active_station=active_stations[0][0]
+```
 
 * Design a query to retrieve the last 12 months of temperature observation data (TOBS).
 
   * Filter by the station with the highest number of observations.
+```
+temp = session.query(Measurement.date, Measurement.tobs).\
+    filter(Measurement.station == most_active_station).filter(Measurement.date >= one_year_ago).\
+    group_by(Measurement.date).all()
+
+temp_df = pd.DataFrame(temp, columns=["date", "temperature"])
+temp_df = temp_df.set_index('date')
+```
 
   * Plot the results as a histogram with `bins=12`.
+```
+plt.hist(temp_df['temperature'], bins=12, label = 'tobs')
+plt.title(f"Frequency of Observed Temperature at Station {most_active_station}")
+plt.legend(loc='upper left')
+plt.xlabel('Observed Temperature (F)')
+plt.xticks(rotation = 45)
+plt.ylabel('Frequency')
+plt.savefig("Images/Temperature.png")
+plt.show()
+```
 
-    ![station-histogram](Images/station-histogram.png)
+   ![station-histogram](Images/Temperature.png)
 
 - - -
 
-
-Images - Images/Precipitation.png, Temperature.png
