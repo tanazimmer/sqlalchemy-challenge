@@ -1,9 +1,7 @@
 # SQLAlchemy Homework
-## Step 1 - Climate Analysis and Exploration (Jupyter Notebook)- climate_starter.ipynb
+## Python in Jupyter Notebook, SQLite
 
-To begin, use Python and SQLAlchemy to do basic climate analysis and data exploration of your climate database. All of the following analysis should be completed using SQLAlchemy ORM queries, Pandas, and Matplotlib.
-
-* Use the provided [starter notebook](climate_starter.ipynb) and [hawaii.sqlite](Resources/hawaii.sqlite) files to complete your climate analysis and data exploration.
+### Challenge: Use Python and SQLAlchemy to do basic climate analysis and data exploration of your climate database. All of the following analysis should be completed using SQLAlchemy ORM queries, Pandas, and Matplotlib.
 
 * Choose a start date and end date for your trip. Make sure that your vacation range is approximately 3-15 days total.
 
@@ -14,18 +12,41 @@ To begin, use Python and SQLAlchemy to do basic climate analysis and data explor
 ### Precipitation Analysis
 
 * Design a query to retrieve the last 12 months of precipitation data.
+```
+last_date = session.query(Measurement.date).order_by(Measurement.date.desc()).first()
+```
 
 * Select only the `date` and `prcp` values.
-
+```
+precip = session.query(Measurement.date, Measurement.prcp).\
+    filter(Measurement.date >= one_year_ago).\
+    order_by(Measurement.date).all()
+``` 
+    
 * Load the query results into a Pandas DataFrame and set the index to the date column.
+```
+precip_df = pd.DataFrame(precip, columns=['date', 'precipitation'])
+precip_df.set_index('date', inplace=True)
+precip_df = precip_df.dropna()
+```
 
 * Sort the DataFrame values by `date`.
+```
+precip_df = precip_df.sort_values(by='date',ascending=True)
+```
 
 * Plot the results using the DataFrame `plot` method.
+```
+precip_df.plot(title="Precipitation over 12 months")
+plt.legend(loc='upper center')
+plt.xlabel('Dates')
+plt.xticks(rotation = 45)
+plt.ylabel('Precipitation')
+plt.savefig("Images/Precipitation.png")
+plt.show()
+```
 
-  ![precipitation](Images/precipitation.png)
-
-* Use Pandas to print the summary statistics for the precipitation data.
+  ![precipitation](Images/Precipitation.png)
 
 ### Station Analysis - climate.py
 
